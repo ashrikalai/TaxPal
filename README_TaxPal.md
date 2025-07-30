@@ -111,9 +111,7 @@ spring.datasource.password=your_password
 
 ## 📫 Author
 
-- 👩‍💻 Your Name
-- 📧 your.email@example.com
-- 🌐 [Portfolio](https://your-portfolio-link.com)
+- 👩‍💻 Ashritha G
 
 ---
 
