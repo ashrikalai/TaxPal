@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TaxPal - Income Tax Estimator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Income Tax Estimator</h1>
+
+    <form id="taxForm">
+      <input type="text" id="name" placeholder="Name" required><br>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <input type="number" id="income" placeholder="Total Income" required><br>
+      <input type="number" id="investment" placeholder="Investment Amount" required><br>
+      <button type="button" onclick="estimateTax()">Estimate Tax</button>
+      <button type="button" onclick="saveData()">Save & Estimate</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const API = "http://localhost:8081/api/tax";
+
+    function estimateTax() {
+      const income = document.getElementById("income").value;
+      const investment = document.getElementById("investment").value;
+
+      fetch(`${API}/estimate?income=${income}&investment=${investment}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("result").innerText = `Estimated Tax: ₹${data.toFixed(2)}`;
+        })
+        .catch(err => {
+          document.getElementById("result").innerText = "Error estimating tax.";
+          console.error(err);
+        });
+    }
+
+    function saveData() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const income = parseFloat(document.getElementById("income").value);
+      const investment = parseFloat(document.getElementById("investment").value);
+
+      const userData = { name, email, income, investment };
+
+      fetch(`${API}/save`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(userData)
+      })
+        .then(res => res.text())
+        .then(msg => {
+          fetch(`${API}/estimate?income=${income}&investment=${investment}`)
+            .then(res => res.json())
+            .then(data => {
+              document.getElementById("result").innerText = `${msg}\nEstimated Tax: ₹${data.toFixed(2)}`;
+            });
+        })
+        .catch(err => {
+          document.getElementById("result").innerText = "Error saving data.";
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>
