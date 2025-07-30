@@ -114,7 +114,3 @@ spring.datasource.password=your_password
 - 👩‍💻 Ashritha G
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License.
