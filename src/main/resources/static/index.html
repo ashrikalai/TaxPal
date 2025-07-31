@@ -18,20 +18,26 @@
       <button type="button" onclick="saveData()">Save & Estimate</button>
     </form>
 
-    <div id="result"></div>
+    <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
   </div>
 
   <script>
-    const API = "http://localhost:8081/api/tax";
+    const API = "/api/tax";
 
     function estimateTax() {
       const income = document.getElementById("income").value;
       const investment = document.getElementById("investment").value;
 
+      if (!income || !investment) {
+        document.getElementById("result").innerText = "Please enter both income and investment.";
+        return;
+      }
+
       fetch(`${API}/estimate?income=${income}&investment=${investment}`)
         .then(res => res.json())
         .then(data => {
-          document.getElementById("result").innerText = `Estimated Tax: ₹${data.toFixed(2)}`;
+          const tax = data.tax;
+          document.getElementById("result").innerText = `Estimated Tax: ₹${tax.toFixed(2)}`;
         })
         .catch(err => {
           document.getElementById("result").innerText = "Error estimating tax.";
@@ -45,6 +51,11 @@
       const income = parseFloat(document.getElementById("income").value);
       const investment = parseFloat(document.getElementById("investment").value);
 
+      if (!name || !email || isNaN(income) || isNaN(investment)) {
+        document.getElementById("result").innerText = "Please fill in all fields correctly.";
+        return;
+      }
+
       const userData = { name, email, income, investment };
 
       fetch(`${API}/save`, {
@@ -54,12 +65,14 @@
         },
         body: JSON.stringify(userData)
       })
-        .then(res => res.text())
+        .then(res => res.json())
         .then(msg => {
+          // After saving, estimate tax
           fetch(`${API}/estimate?income=${income}&investment=${investment}`)
             .then(res => res.json())
             .then(data => {
-              document.getElementById("result").innerText = `${msg}\nEstimated Tax: ₹${data.toFixed(2)}`;
+              const tax = data.tax;
+              document.getElementById("result").innerText = `${msg.message || "Saved!"}\nEstimated Tax: ₹${tax.toFixed(2)}`;
             });
         })
         .catch(err => {
